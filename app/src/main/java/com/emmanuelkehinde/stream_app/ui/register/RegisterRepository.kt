@@ -1,24 +1,26 @@
-package com.emmanuelkehinde.stream_app.ui.login
+package com.emmanuelkehinde.stream_app.ui.register
 
 import android.os.Handler
 import com.emmanuelkehinde.stream_app.data.response.LoginResponse
+import com.emmanuelkehinde.stream_app.data.response.RegisterResponse
 import com.emmanuelkehinde.stream_app.network.ApiService
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class LoginRepository(var apiService: ApiService) {
+class RegisterRepository(var apiService: ApiService) {
 
     var compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-    internal fun loginUser(email: String, password: String, successHandler: (LoginResponse) -> Unit, failureHandler: (Throwable?) -> Unit) {
+    internal fun registerUser(fullName: String, email: String, password: String, successHandler: (RegisterResponse) -> Unit, failureHandler: (Throwable?) -> Unit) {
         Handler().postDelayed({
-            successHandler(LoginResponse(true,"",""))
+            successHandler(RegisterResponse(true,"",""))
         },3000)
 
 //        compositeDisposable.add(
-//                apiService.login()
+//                apiService.register()
 //                        .subscribeOn(Schedulers.io())
 //                        .observeOn(AndroidSchedulers.mainThread())
 //                        .subscribe({

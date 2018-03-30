@@ -22,7 +22,7 @@
         app:layout_constraintVertical_bias="0.44">
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/edt_email"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:background="@drawable/bg_edit_text"
@@ -34,7 +34,7 @@
             android:textColorHint="@color/grey9" />
 
         <EditText
-            android:id="@+id/editText2"
+            android:id="@+id/edt_password"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="@dimen/d16"
