@@ -43,7 +43,8 @@ dependencies {
 
     //Dependency Injection
     kapt "com.google.dagger:dagger:$rootProject.daggerVersion"
-    implementation "com.google.dagger:dagger-android-support:$rootProject.daggerVersion" // if you use the support libraries
+    implementation "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"
+    // if you use the support libraries
     kapt "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
     compileOnly 'javax.annotation:jsr250-api:1.0'
 

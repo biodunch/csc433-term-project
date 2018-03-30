@@ -3,8 +3,10 @@
     <color name="colorPrimary">#212121</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#FF3D00</color>
+    <color name="colorAccentDark">#dd2c00</color>
     <color name="grey4">#424242</color>
     <color name="grey3">#303030</color>
     <color name="grey2">#212121</color>
+    <color name="grey9">#999999</color>
     <color name="white">#FFFFFF</color>
 </resources>

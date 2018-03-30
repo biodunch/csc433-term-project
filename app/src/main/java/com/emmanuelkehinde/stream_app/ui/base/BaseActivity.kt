@@ -5,8 +5,11 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
+import com.emmanuelkehinde.stream_app.ui.custom.CustomDialog
 
 open class BaseActivity: AppCompatActivity() {
+
+    private lateinit var customDialog: CustomDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,5 +27,16 @@ open class BaseActivity: AppCompatActivity() {
 
     internal fun showLongToast(message: String) {
         Toast.makeText(this,message,Toast.LENGTH_LONG).show()
+    }
+
+    internal fun showCustomDialog(cancellable: Boolean = false) {
+        customDialog = CustomDialog(this,cancellable)
+        customDialog.show()
+    }
+
+    internal fun hideCustomDialog() {
+        if (customDialog.isShowing) {
+            customDialog.cancel()
+        }
     }
 }

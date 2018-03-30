@@ -7,6 +7,7 @@ import android.os.Bundle
 import com.emmanuelkehinde.stream_app.R
 import com.emmanuelkehinde.stream_app.ui.base.BaseActivity
 import com.emmanuelkehinde.stream_app.ui.MainActivity
+import com.emmanuelkehinde.stream_app.ui.login.LoginActivity
 
 class SplashActivity : BaseActivity() {
 
@@ -19,13 +20,19 @@ class SplashActivity : BaseActivity() {
         splashViewModel.startCountDown()
         splashViewModel.goToNext().observe(this, Observer { t ->
             if (t == true) {
-                goToMainActivity()
+                goToLoginActivity()
+//                goToMainActivity()
             }
         })
     }
 
     private fun goToMainActivity() {
-        startActivity(Intent(this,MainActivity::class.java))
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
+    }
+
+    private fun goToLoginActivity() {
+        startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
 
