@@ -1,5 +1,7 @@
 package com.emmanuelkehinde.stream_app.di.module
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.emmanuelkehinde.stream_app.BuildConfig
 import com.emmanuelkehinde.stream_app.network.ApiService
 import com.google.gson.Gson
@@ -70,5 +72,11 @@ class ApiModule {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
                 .create(ApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(context: Context): SharedPreferences? {
+        return context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
     }
 }

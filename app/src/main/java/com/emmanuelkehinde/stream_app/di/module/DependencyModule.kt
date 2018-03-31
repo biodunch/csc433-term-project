@@ -1,5 +1,7 @@
 package com.emmanuelkehinde.stream_app.di.module
 
+import android.content.SharedPreferences
+import com.emmanuelkehinde.stream_app.helper.SharedPrefHelper
 import com.emmanuelkehinde.stream_app.network.ApiService
 import com.emmanuelkehinde.stream_app.ui.login.LoginRepository
 import com.emmanuelkehinde.stream_app.ui.register.RegisterRepository
@@ -20,5 +22,11 @@ class DependencyModule {
     @Singleton
     fun provideRegisterRepository(apiService: ApiService): RegisterRepository {
         return RegisterRepository(apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharedPrefHelper(sharedPreferences: SharedPreferences): SharedPrefHelper {
+        return SharedPrefHelper(sharedPreferences)
     }
 }
