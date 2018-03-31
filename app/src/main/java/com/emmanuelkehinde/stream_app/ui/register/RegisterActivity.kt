@@ -31,13 +31,13 @@ class RegisterActivity : BaseActivity() {
     }
 
     private fun attachObserver() {
-        registerViewModel.validationError.observe(this, Observer<String> {
+        registerViewModel.getValidationError().observe(this, Observer<String> {
             it?.let {
                 showLongToast(it)
             }
         })
 
-        registerViewModel.isLoading.observe(this, Observer<Boolean> {
+        registerViewModel.isLoading().observe(this, Observer<Boolean> {
             it?.let {
                 if (it) {
                     showCustomDialog()
@@ -45,12 +45,12 @@ class RegisterActivity : BaseActivity() {
                 else hideCustomDialog()
             }
         })
-        registerViewModel.registerError.observe(this, Observer<Throwable> {
+        registerViewModel.getRegisterError().observe(this, Observer<Throwable> {
             it?.let {
                 showLongToast("Registration Failed: " + it.localizedMessage)
             }
         })
-        registerViewModel.registerResponse.observe(this, Observer<String> {
+        registerViewModel.getRegisterResponse().observe(this, Observer<String> {
             it?.let {
                 goToLoginActivity()
             }

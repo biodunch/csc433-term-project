@@ -8,6 +8,7 @@ import com.emmanuelkehinde.stream_app.App
 import com.emmanuelkehinde.stream_app.R
 import com.emmanuelkehinde.stream_app.ui.base.BaseActivity
 import com.emmanuelkehinde.stream_app.ui.register.RegisterActivity
+import com.emmanuelkehinde.stream_app.ui.streaming.StreamingActivity
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : BaseActivity() {
@@ -33,13 +34,13 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun attachObserver() {
-        loginViewModel.validationError.observe(this,Observer<String> {
+        loginViewModel.getValidationError().observe(this,Observer<String> {
             it?.let {
                 showLongToast(it)
             }
         })
 
-        loginViewModel.isLoading.observe(this, Observer<Boolean> {
+        loginViewModel.isLoading().observe(this, Observer<Boolean> {
             it?.let {
                 if (it) {
                     showCustomDialog()
@@ -47,14 +48,14 @@ class LoginActivity : BaseActivity() {
                 else hideCustomDialog()
             }
         })
-        loginViewModel.loginError.observe(this, Observer<Throwable> {
+        loginViewModel.getLoginError().observe(this, Observer<Throwable> {
             it?.let {
                 showLongToast("Login Failed: " + it.localizedMessage)
             }
         })
-        loginViewModel.loginResponse.observe(this, Observer<String> {
+        loginViewModel.getLoginResponse().observe(this, Observer<String> {
             it?.let {
-                goToRegisterActivity()
+                goToStreamingActivity()
             }
         })
     }
@@ -62,5 +63,10 @@ class LoginActivity : BaseActivity() {
     private fun goToRegisterActivity() {
         startActivity(Intent(this,RegisterActivity::class.java))
         overridePendingTransition(R.anim.transition_enter, R.anim.transition_exit)
+    }
+
+    private fun goToStreamingActivity() {
+        startActivity(Intent(this, StreamingActivity::class.java))
+        finish()
     }
 }

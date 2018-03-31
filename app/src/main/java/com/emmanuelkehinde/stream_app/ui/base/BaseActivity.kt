@@ -1,6 +1,6 @@
 package com.emmanuelkehinde.stream_app.ui.base
 
-import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.Window
 import android.view.WindowManager
@@ -10,10 +10,6 @@ import com.emmanuelkehinde.stream_app.ui.custom.CustomDialog
 open class BaseActivity: AppCompatActivity() {
 
     private lateinit var customDialog: CustomDialog
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     internal fun addFullScreenParameters() {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -38,5 +34,22 @@ open class BaseActivity: AppCompatActivity() {
         if (customDialog.isShowing) {
             customDialog.cancel()
         }
+    }
+
+    internal fun showConfirmDialog(title: String?, message: String?,
+                                   positiveBtnClickListener: () -> Unit, negativeBtnClickListener: (() -> Unit)?){
+        val builder = AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setPositiveButton("YES", { dialogInterface, i ->
+                    positiveBtnClickListener.invoke()
+                })
+                .setNegativeButton("NO", { dialogInterface, i ->
+                    dialogInterface.cancel()
+                    negativeBtnClickListener?.invoke()
+                })
+        val alertDialog = builder.create()
+        title?.let { alertDialog.setTitle(it) }
+        message?.let { alertDialog.setMessage(it) }
+        alertDialog.show()
     }
 }

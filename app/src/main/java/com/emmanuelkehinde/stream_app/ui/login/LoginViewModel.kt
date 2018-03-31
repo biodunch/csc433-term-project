@@ -9,13 +9,13 @@ class LoginViewModel: ViewModel() {
     @Inject
     lateinit var loginRepository: LoginRepository
 
-    var validationError = MutableLiveData<String>()
+    private var isLoading = MutableLiveData<Boolean>()
 
-    var isLoading = MutableLiveData<Boolean>()
+    private var validationError = MutableLiveData<String>()
 
-    var loginError = MutableLiveData<Throwable>()
+    private var loginError = MutableLiveData<Throwable>()
 
-    var loginResponse = MutableLiveData<String>()
+    private var loginResponse = MutableLiveData<String>()
 
     internal fun loginUser(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) {
@@ -37,5 +37,21 @@ class LoginViewModel: ViewModel() {
                     loginError.value = it
                 }
         )
+    }
+
+    fun getValidationError(): MutableLiveData<String> {
+        return validationError
+    }
+
+    fun getLoginError(): MutableLiveData<Throwable> {
+        return loginError
+    }
+
+    fun getLoginResponse(): MutableLiveData<String> {
+        return loginResponse
+    }
+
+    fun isLoading(): MutableLiveData<Boolean> {
+        return isLoading
     }
 }
