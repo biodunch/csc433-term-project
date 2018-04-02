@@ -10,7 +10,6 @@ import android.os.Build
 import kotlinx.android.synthetic.main.activity_stream.*
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
-import android.view.TextureView
 import android.os.HandlerThread
 import android.media.ImageReader
 import android.os.Handler
@@ -18,19 +17,25 @@ import android.util.Size
 import android.widget.Toast
 import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
-import android.view.Surface
-import android.view.SurfaceHolder
-import android.view.View
+import android.view.*
+import com.emmanuelkehinde.stream_app.BuildConfig
 import java.util.*
 import com.emmanuelkehinde.stream_app.ui.base.BaseActivity
+import com.red5pro.streaming.R5Connection
+import com.red5pro.streaming.R5Stream
+import com.red5pro.streaming.R5StreamProtocol
+import com.red5pro.streaming.config.R5Configuration
+import com.red5pro.streaming.source.R5Camera
+import com.red5pro.streaming.source.R5Camera2
+import com.red5pro.streaming.source.R5Microphone
 
 
 class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
 
-//    private var configuration: R5Configuration
+    private lateinit var configuration: R5Configuration
     private var camera: Camera? = null
     private var isPublishing = false
-//    protected var stream: R5Stream? = null
+    private var stream: R5Stream? = null
 
     private val REQUEST_CAMERA_PERMISSION = 200
     private var cameraId: String? = null
@@ -41,36 +46,39 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
     private var imageReader: ImageReader? = null
     private var mBackgroundHandler: Handler? = null
     private var mBackgroundThread: HandlerThread? = null
+    private lateinit var characteristics: CameraCharacteristics
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stream)
 
-//        configuration = R5Configuration(R5StreamProtocol.RTSP, "localhost", 8554, "live", 1.0f)
-//        configuration.setLicenseKey("YOUR-SDK-LICENSE-KEY")
-//        configuration.setBundleID(this.getPackageName())
+        configuration = R5Configuration(R5StreamProtocol.RTSP, "127.0.0.1", 5080, "live", 1.0f)
+        configuration.licenseKey = BuildConfig.red5pro_license_key
+        configuration.bundleID = this.packageName
 
-        textureView?.surfaceTextureListener = textureListener
+//        textureView?.surfaceTextureListener = textureListener
 
         btn_start_stream.setOnClickListener {
-            showConfirmDialog(null,"Start LiveStream?",{
-                //TODO Start LiveStream
+            if (isPublishing) {
+                showConfirmDialog(null,"End LiveStream?",{
+                    //TODO Start LiveStream
 
-                showToast(getString(R.string.prompt_msg_livestream_started))
-                btn_end_stream.visibility = View.VISIBLE
-                btn_start_stream.visibility = View.GONE
-            },null)
-        }
+                    stop()
+                    isPublishing = false
+                    showToast(getString(R.string.prompt_msg_livestream_end))
+                    btn_start_stream.text = "Start LiveStream"
+                },null)
+            } else {
+                showConfirmDialog(null,"Start LiveStream?",{
+                    //TODO Start LiveStream
 
-        btn_end_stream.setOnClickListener {
-            showConfirmDialog(null,"End LiveStream?",{
-                //TODO Start LiveStream
-
-                showToast(getString(R.string.prompt_msg_livestream_end))
-                btn_end_stream.visibility = View.GONE
-                btn_start_stream.visibility = View.VISIBLE
-            },null)
+                    start()
+                    isPublishing = true
+                    showToast(getString(R.string.prompt_msg_livestream_started))
+                    btn_start_stream.text = "End LiveStream"
+                },null)
+            }
         }
 
     }
@@ -91,6 +99,25 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
         }
 
         override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
+    }
+
+    private val surfaceListener: SurfaceHolder.Callback = object : SurfaceHolder.Callback {
+        override fun surfaceChanged(p0: SurfaceHolder?, p1: Int, p2: Int, p3: Int) {
+            try {
+                openCamera()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        override fun surfaceDestroyed(p0: SurfaceHolder?) {
+
+        }
+
+        override fun surfaceCreated(p0: SurfaceHolder?) {
+//            openCamera()
+        }
+
     }
 
     private val stateCallback = object : CameraDevice.StateCallback() {
@@ -116,9 +143,9 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
     private fun createCameraPreview() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             try {
-                val texture = textureView.surfaceTexture!!
-                texture.setDefaultBufferSize(imageDimension!!.width, imageDimension!!.height)
-                val surface = Surface(texture)
+                val holder = surfaceView.holder
+                holder.setFixedSize(imageDimension!!.width, imageDimension!!.height)
+                val surface = holder.surface
                 captureRequestBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     captureRequestBuilder?.addTarget(surface)
@@ -135,7 +162,6 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
                         }
 
                         override fun onConfigureFailed(@NonNull cameraCaptureSession: CameraCaptureSession) {
-                            Toast.makeText(this@StreamingActivity, "Configuration change", Toast.LENGTH_SHORT).show()
                         }
                     }, null)
                 }
@@ -145,18 +171,20 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
         }
     }
 
+
     private fun openCamera() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val manager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
             try {
                 cameraId = manager.getCameraIdList()[0]
-                val characteristics = manager.getCameraCharacteristics(cameraId)
+
+                characteristics = manager.getCameraCharacteristics(cameraId)
                 val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                 imageDimension = map.getOutputSizes(SurfaceTexture::class.java)[0]
                 // Add permission for camera and let user grant the permission
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_CAMERA_PERMISSION)
+                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.CAPTURE_AUDIO_OUTPUT, Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_CAMERA_PERMISSION)
                     return
                 }
                 manager.openCamera(cameraId, stateCallback, null)
@@ -210,6 +238,27 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
         }
     }
 
+    private fun start() {
+       closeCamera()
+
+       stream = R5Stream(R5Connection(configuration))
+        stream?.setLogLevel(R5Stream.LOG_LEVEL_DEBUG)
+       stream?.setView(surfaceView)
+
+        val r5Camera = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            R5Camera2(cameraDevice,characteristics, imageDimension!!.width, imageDimension!!.height)
+        } else {
+            TODO("VERSION.SDK_INT < LOLLIPOP")
+        }
+        val r5Microphone = R5Microphone()
+
+       stream?.attachCamera(r5Camera)
+       stream?.attachMic(r5Microphone)
+
+       stream?.publish("red5prostream", R5Stream.RecordType.Live)
+       openCamera()
+     }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
@@ -222,14 +271,21 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
     override fun onResume() {
         super.onResume()
         startBackgroundThread()
+        surfaceView.holder.addCallback(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (textureView?.isAvailable!!) {
-                openCamera()
-            } else {
-                textureView?.surfaceTextureListener = textureListener
-            }
+//            if (textureView?.isAvailable!!) {
+//                openCamera()
+//            } else {
+//                textureView?.surfaceTextureListener = textureListener
+//            }
         } else {
             preview()
+        }
+    }
+
+    private fun stop() {
+        if (stream != null) {
+            stream?.stop()
         }
     }
 
@@ -250,11 +306,16 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
 
     override fun surfaceChanged(surfaceHolder: SurfaceHolder?, p1: Int, p2: Int, p3: Int) {
         try {
-            camera?.setPreviewDisplay(surfaceHolder)
-            camera?.startPreview()
+            openCamera()
         } catch (e: Exception) {
             e.printStackTrace()
         }
+//        try {
+//            camera?.setPreviewDisplay(surfaceHolder)
+//            camera?.startPreview()
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
     }
 
     override fun surfaceDestroyed(p0: SurfaceHolder?) {
