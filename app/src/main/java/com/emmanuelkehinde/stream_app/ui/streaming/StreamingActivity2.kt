@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import com.emmanuelkehinde.shutdown.Shutdown
 import com.emmanuelkehinde.stream_app.BuildConfig
@@ -45,6 +46,7 @@ class StreamingActivity2 : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_streaming2)
         preview = findViewById(R.id.videoPreview)
 
