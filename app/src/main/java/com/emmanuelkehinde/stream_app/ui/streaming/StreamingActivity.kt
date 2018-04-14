@@ -53,7 +53,7 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stream)
 
-        configuration = R5Configuration(R5StreamProtocol.RTSP, "127.0.0.1", 5080, "live", 1.0f)
+        configuration = R5Configuration(R5StreamProtocol.RTSP, "192.168.8.100", 8554, "live", 1.0f)
         configuration.licenseKey = BuildConfig.red5pro_license_key
         configuration.bundleID = this.packageName
 
@@ -120,24 +120,28 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
 
     }
 
-    private val stateCallback = object : CameraDevice.StateCallback() {
-        override fun onOpened(camera: CameraDevice) {
-            cameraDevice = camera
-            createCameraPreview()
-        }
+    private val stateCallback = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        object : CameraDevice.StateCallback() {
+            override fun onOpened(camera: CameraDevice) {
+                cameraDevice = camera
+                createCameraPreview()
+            }
 
-        override fun onDisconnected(camera: CameraDevice) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                cameraDevice?.close()
+            override fun onDisconnected(camera: CameraDevice) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    cameraDevice?.close()
+                }
+            }
+
+            override fun onError(camera: CameraDevice, error: Int) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    cameraDevice?.close()
+                }
+                cameraDevice = null
             }
         }
-
-        override fun onError(camera: CameraDevice, error: Int) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                cameraDevice?.close()
-            }
-            cameraDevice = null
-        }
+    } else {
+        TODO("VERSION.SDK_INT < LOLLIPOP")
     }
 
     private fun createCameraPreview() {

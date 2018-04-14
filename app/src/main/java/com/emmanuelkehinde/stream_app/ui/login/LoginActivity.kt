@@ -9,6 +9,7 @@ import com.emmanuelkehinde.stream_app.R
 import com.emmanuelkehinde.stream_app.ui.base.BaseActivity
 import com.emmanuelkehinde.stream_app.ui.register.RegisterActivity
 import com.emmanuelkehinde.stream_app.ui.streaming.StreamingActivity
+import com.emmanuelkehinde.stream_app.ui.streaming.StreamingActivity2
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : BaseActivity() {
@@ -66,7 +67,7 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun goToStreamingActivity() {
-        startActivity(Intent(this, StreamingActivity::class.java))
+        startActivity(Intent(this, StreamingActivity2::class.java))
         finish()
     }
 }
