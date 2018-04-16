@@ -30,7 +30,7 @@ import com.red5pro.streaming.view.R5VideoView
 import kotlinx.android.synthetic.main.activity_streaming2.*
 
 @TargetApi(21)
-class StreamingActivity2 : BaseActivity() {
+class StreamingActivity2 : BaseActivity(), ConfirmStreamingDialog.ConfirmStreamingListener {
 
     private var preview: R5VideoView? = null
     private var publish: R5Stream? = null
@@ -67,13 +67,9 @@ class StreamingActivity2 : BaseActivity() {
                     btn_start_stream?.text = "Start LiveStream"
                 },null)
             } else {
-                showConfirmDialog(null,"Start LiveStream?",{
-
-                    startPublishing()
-                    isPublishing = true
-                    showToast(getString(R.string.prompt_msg_livestream_started))
-                    btn_start_stream.text = "End LiveStream"
-                },null)
+                val confirmStreamingDialog = ConfirmStreamingDialog()
+                confirmStreamingDialog.isCancelable = false
+                confirmStreamingDialog.show(fragmentManager,"ConfirmStreamingDialog")
             }
         }
     }
@@ -143,9 +139,9 @@ class StreamingActivity2 : BaseActivity() {
         preview?.attachStream(publish)
     }
 
-    private fun startPublishing() {
+    private fun startPublishing(streamName: String) {
         publish?.setListener(r5ConnectionListener)
-        publish?.publish("red5pro", R5Stream.RecordType.Live)
+        publish?.publish(streamName, R5Stream.RecordType.Live)
     }
 
     private fun stopPublishing() {
@@ -200,4 +196,10 @@ class StreamingActivity2 : BaseActivity() {
         Shutdown.now(this)
     }
 
+    override fun onYesTapped(streamName: String) {
+        startPublishing(streamName)
+        isPublishing = true
+        showToast(getString(R.string.prompt_msg_livestream_started))
+        btn_start_stream.text = "End LiveStream"
+    }
 }

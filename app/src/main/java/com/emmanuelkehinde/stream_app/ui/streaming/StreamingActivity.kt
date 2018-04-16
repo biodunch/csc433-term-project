@@ -62,7 +62,6 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
         btn_start_stream.setOnClickListener {
             if (isPublishing) {
                 showConfirmDialog(null,"End LiveStream?",{
-                    //TODO Start LiveStream
 
                     stop()
                     isPublishing = false
@@ -71,7 +70,6 @@ class StreamingActivity : BaseActivity(), SurfaceHolder.Callback {
                 },null)
             } else {
                 showConfirmDialog(null,"Start LiveStream?",{
-                    //TODO Start LiveStream
 
                     start()
                     isPublishing = true

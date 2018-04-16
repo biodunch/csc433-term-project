@@ -52,4 +52,5 @@ open class BaseActivity: AppCompatActivity() {
         message?.let { alertDialog.setMessage(it) }
         alertDialog.show()
     }
+
 }
