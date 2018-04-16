@@ -50,7 +50,7 @@ class StreamingActivity2 : BaseActivity(), ConfirmStreamingDialog.ConfirmStreami
         setContentView(R.layout.activity_streaming2)
         preview = findViewById(R.id.videoPreview)
 
-        configuration = R5Configuration(R5StreamProtocol.RTSP, "192.168.8.100", 8554, "live", 1.0f)
+        configuration = R5Configuration(R5StreamProtocol.RTSP, BuildConfig.streaming_server_host, BuildConfig.streaming_server_port, "live", 1.0f)
         configuration.licenseKey = BuildConfig.red5pro_license_key
         configuration.bundleID = this.packageName
 
